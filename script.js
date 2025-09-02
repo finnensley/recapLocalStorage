@@ -36,7 +36,7 @@ const loadBookmarks = () => {
     const parsed = bookmarks ? JSON.parse(bookmarks) : [];
     return parsed;
   } catch (err) {
-    // console.error("JSON.parse did not work", err);
+    console.error("JSON.parse did not work", err);
     return [];
   }
 };
@@ -52,12 +52,10 @@ const loadBookmarks = () => {
 //     * Console hint: console.log the stringified data before saving
 
 const saveBookmarks = (bookmarksArray) => {
-//   const string = bookmarksArray;
   localStorage.setItem("bookmarks", JSON.stringify(bookmarksArray));
   console.log(bookmarksArray);
 };
 
-// saveBookmarks(["Moby Dick", 2, 3, 4]);
 
 // ---------------------------------------------------------------------------
 // STEP 4: FUNCTION render()
