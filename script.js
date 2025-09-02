@@ -32,18 +32,16 @@ console.log(titleInput, urlInput, removeKeyBtn, emptyStateEl);
 
 const loadBookmarks = () => {
   const bookmarks = localStorage.getItem("bookmarks");
-  console.log(bookmarks);
   try {
     const parsed = bookmarks ? JSON.parse(bookmarks) : [];
-    console.log(parsed);
     return parsed;
   } catch (err) {
-    console.error("JSON.parse did not work", err);
+    // console.error("JSON.parse did not work", err);
     return [];
   }
 };
 
-// loadBookmarks();
+
 
 // ---------------------------------------------------------------------------
 // STEP 3: FUNCTION saveBookmarks(bookmarksArray)
@@ -54,12 +52,12 @@ const loadBookmarks = () => {
 //     * Console hint: console.log the stringified data before saving
 
 const saveBookmarks = (bookmarksArray) => {
-  const string = JSON.stringify(bookmarksArray);
-  localStorage.setItem("bookmarks", string);
-  console.log(string);
+//   const string = bookmarksArray;
+  localStorage.setItem("bookmarks", JSON.stringify(bookmarksArray));
+  console.log(bookmarksArray);
 };
 
-saveBookmarks([1, 2, 3, 4]);
+// saveBookmarks(["Moby Dick", 2, 3, 4]);
 
 // ---------------------------------------------------------------------------
 // STEP 4: FUNCTION render()
@@ -81,22 +79,24 @@ saveBookmarks([1, 2, 3, 4]);
 const render = () => {
   listEl.innerHTML = "";
   const savedBookmarks = loadBookmarks();
-  console.log(savedBookmarks.length);
+//   console.log(savedBookmarks.length);
 
-  if (!savedBookmarks.length) {
+  if (savedBookmarks.length === 0) {
     emptyStateEl.style.display = "block";
     return;
+  } else {
+  emptyStateEl.style.display = "none";
   }
 
-  emptyStateEl.style.display = "none";
-
-  savedBookmarks.forEach = (bookmark, index) => {
+  savedBookmarks.forEach((bookmark, index) => {
     const li = document.createElement("li");
     const bookmarkURL = document.createElement("a");
     bookmarkURL.href = bookmark.url;
     bookmarkURL.target = "_blank";
     bookmarkURL.rel = "noopener noreferrer";
     bookmarkURL.textContent = bookmark.title || bookmark.url;
+    const actions = document.createElement("div");
+    actions.className = "actions";
 
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "delete";
@@ -106,20 +106,16 @@ const render = () => {
       saveAgain.splice(index, 1);
       saveBookmarks(saveAgain);
       render();
-      setStatus();
 
-      const actions = document.createElement("div");
-      actions.className = "actions";
-      actions.appendChild(deleteBtn);
+    });
+     actions.appendChild(deleteBtn);
       li.appendChild(bookmarkURL);
       li.appendChild(deleteBtn);
-
       listEl.appendChild(li);
-    });
-  };
+  });
 };
 
-render();
+
 
 // ---------------------------------------------------------------------------
 // STEP 5: FUNCTION setStatus(message)
@@ -132,7 +128,6 @@ const setStatus = (message) => {
   console.log(message);
 };
 
-setStatus("Didn't work");
 
 // ---------------------------------------------------------------------------
 // STEP 6: FUNCTION isValidUrl(url)
@@ -141,6 +136,13 @@ setStatus("Didn't work");
 // - Return true if valid, false otherwise
 // - Console hint: console.log the url and the boolean result to verify your checker
 
+const isValidUrl = (url) => {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+        return true
+} else {
+    return false
+}
+};
 // ---------------------------------------------------------------------------
 // STEP 7: BUTTON HANDLERS
 // - Add an event listener to addBtn
@@ -159,7 +161,45 @@ setStatus("Didn't work");
 //     • Console hint: console.log that clear() is being called
 //     • Call localStorage.clear(), then call render(), then call setStatus("All localStorage cleared")
 
+addBtn.addEventListener("click", () => {
+    const title = titleInput.value;
+    const url = urlInput.value;
+
+    if (!isValidUrl(url)) {
+        setStatus("Invalid URL");
+        return;
+    } 
+
+    const bookmarks = loadBookmarks();
+    bookmarks.push({ title, url});
+    saveBookmarks(bookmarks);
+
+    titleInput.value = "";
+    urlInput.value = "";
+    setStatus("Bookmark saved!")
+    render();
+});
+
+showBtn.addEventListener("click", () => {
+    render();
+    setStatus("Bookmarks loaded")
+});
+
+removeKeyBtn.addEventListener("click", () => {
+    localStorage.removeItem("bookmarks");
+    render();
+    setStatus("'bookmarks' key removed");
+});
+
+clearAllBtn.addEventListener("click", () => {
+    localStorage.clear();
+    render();
+    setStatus("All localStorage cleared")
+});
+
 // ---------------------------------------------------------------------------
 // STEP 8: INITIAL CALL
 // - At the very end of the file, call render() so saved bookmarks show up when the page loads
 // - Console hint: console.log that initial render is running
+
+render();
